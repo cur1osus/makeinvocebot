@@ -58,14 +58,18 @@ async def get_order(
     chain_messages = [system_prompt, user_prompt]
     answer = fn.get_answer(chain_messages)
 
-    filename = generate_invoice(answer)
-    await message.answer_document(document=FSInputFile(path=filename))
+    filename = None
+    try:
+        filename = generate_invoice(answer)
+        await message.answer_document(document=FSInputFile(path=filename))
+    except Exception as e:
+        await message.answer(f"Не смог сгенерировать накладную, ошибка: {e}")
 
     message_db = MessageDB(content=order, timestamp=datetime.now().timestamp(), role="user")
     message_db_from_assistant = MessageDB(content=answer, timestamp=datetime.now().timestamp(), role="assistant")
     chat.messages.append(message_db)
     chat.messages.append(message_db_from_assistant)
     user.chats.append(chat)
-
-    os.remove(filename)
+    if filename:
+        os.remove(filename)
     await session.commit()
