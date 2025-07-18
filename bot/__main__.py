@@ -52,13 +52,7 @@ async def shutdown(dispatcher: Dispatcher) -> None:
 
 
 async def set_default_commands(bot: Bot) -> None:
-    await bot.set_my_commands(
-        [
-            BotCommand(command="start", description="start"),
-            BotCommand(command="new_chat", description="Новый чат"),
-            BotCommand(command="end_chat", description="Закончить чат"),
-        ]
-    )
+    await bot.set_my_commands([BotCommand(command="start", description="start")])
 
 
 async def main() -> None:

@@ -22,8 +22,11 @@ def generate_invoice(
     # Парсим JSON
     order_json = order_json.strip().strip("```").lstrip("json")
     order = json.loads(order_json)
-    date_str = order["order"]["date"]
-    day, month = map(int, date_str.split("."))
+    date_str = order["order"].get("date")
+    try:
+        day, month = map(int, date_str.split("."))
+    except:  # noqa
+        day, month = datetime.now().day, datetime.now().month
 
     # Форматирование даты
     months = [
@@ -48,32 +51,17 @@ def generate_invoice(
     name = order.get("name")
     phone = order.get("phone")
     items = order.get("items")
-    total = order.get("total")
-    total = order.get("final_total") or total
+    total = order.get("total_from_text")
     address = order.get("address")
 
-    # Функция для обработки количества и единиц измерения
-    def format_quantity(quantity):
-        if isinstance(quantity, (int, float)):
-            return str(quantity), "шт"
-        elif isinstance(quantity, str):
-            match = re.match(r"(\d+\.?\d*)(.*)", quantity)
-            if match:
-                num, unit = match.groups()
-                return num, unit.strip() or "кг"
-            else:
-                return quantity, ""
-        elif not isinstance(quantity, (int, float, str)):
-            return "", ""
-        else:
-            return str(quantity), ""
-
     # Формируем данные для таблицы товаров
-    item_data = [["№", "Наименование товара", "Кол-во", "Ед."]]
+    item_data = [["№", "Наименование товара", "Кол-во", "Ед.", "Стоимость"]]
     for i, item in enumerate(items, 1):
         name = item["name"]
-        quantity, unit = format_quantity(item["quantity"])
-        item_data.append([str(i), name, quantity, unit])
+        quantity = item["quantity"]
+        unit = item["unit"]
+        price = item["price"]
+        item_data.append([str(i), name, quantity, unit, price])
 
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")
@@ -102,7 +90,7 @@ def generate_invoice(
     elements.append(Spacer(1, 12))
 
     # Таблица товаров
-    table = Table(item_data, colWidths=[30, 350, 60, 80], hAlign="LEFT")
+    table = Table(item_data, colWidths=[30, 350, 60, 80, 80], hAlign="LEFT")
     table.setStyle(
         TableStyle(
             [

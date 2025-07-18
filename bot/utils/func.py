@@ -16,7 +16,7 @@ class Function:
             model="mistral-saba-24b",
             messages=chain_messages,
             temperature=1,
-            max_completion_tokens=1024,
+            max_completion_tokens=10000,
             top_p=1,
             stream=False,
             stop=None,
