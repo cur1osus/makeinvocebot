@@ -90,7 +90,7 @@ def generate_invoice(
     elements.append(Spacer(1, 12))
 
     # Таблица товаров
-    table = Table(item_data, colWidths=[30, 350, 60, 80, 80], hAlign="LEFT")
+    table = Table(item_data, colWidths=[30, 280, 60, 80, 80], hAlign="LEFT")
     table.setStyle(
         TableStyle(
             [
