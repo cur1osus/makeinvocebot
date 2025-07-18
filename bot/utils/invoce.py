@@ -52,6 +52,7 @@ def generate_invoice(
     phone = order.get("phone")
     items = order.get("items")
     total = order.get("total_from_text")
+    total = total or order.get("total")
     address = order.get("address")
 
     # Формируем данные для таблицы товаров
