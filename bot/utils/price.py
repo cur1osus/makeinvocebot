@@ -284,7 +284,10 @@ def find_best_match(user_input: str) -> ItemPrice:
         return catalog[user_input]
     else:
         first_search = [j for i in user_input.split() for j in catalog if i in j]
-        matches = get_close_matches(user_input, first_search, n=1, cutoff=0.5)
+        if len(first_search) > 1:
+            matches = get_close_matches(user_input, first_search, n=1, cutoff=0.5)
+        else:
+            return catalog[first_search[0]]
         if not matches:
             matches = get_close_matches(user_input, catalog.keys(), n=1, cutoff=0.5)
         if matches:
@@ -303,4 +306,4 @@ def calculate_price(name_product: str, quantity: str = "1") -> tuple[str, Decima
     return item.name, price
 
 
-print(find_best_match("Паста Болоньезе"))
+print(find_best_match("блины трио"))
