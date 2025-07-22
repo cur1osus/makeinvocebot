@@ -54,6 +54,9 @@ async def get_order(
     session: AsyncSession,
     state: FSMContext,
 ) -> None:
+    if user is None and message.from_user:
+        await message.answer("Пожалуйста, нажмите кнопку /start для авторизации")
+        return
     order = message.text or ""
 
     chat = ChatDB(chat_name=uuid.uuid4())
