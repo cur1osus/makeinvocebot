@@ -283,7 +283,10 @@ def find_best_match(user_input: str) -> ItemPrice:
     if user_input in catalog:
         return catalog[user_input]
     else:
-        matches = get_close_matches(user_input, catalog.keys(), n=1, cutoff=0.5)
+        first_search = [j for i in user_input.split() for j in catalog if i in j]
+        matches = get_close_matches(user_input, first_search, n=1, cutoff=0.5)
+        if not matches:
+            matches = get_close_matches(user_input, catalog.keys(), n=1, cutoff=0.5)
         if matches:
             print(f"[!] Использовано приближённое совпадение: '{matches[0]}' вместо '{user_input}'")
             return catalog[matches[0]]
@@ -298,3 +301,6 @@ def calculate_price(name_product: str, quantity: str = "1") -> tuple[str, Decima
     item = find_best_match(name_product)
     price = get_price(item, quantity)
     return item.name, price
+
+
+print(find_best_match("Паста Болоньезе"))

@@ -56,16 +56,15 @@ def generate_invoice(
 
     # Формируем данные для таблицы товаров
     item_data = [["№", "Наименование товара", "Кол-во", "Ед.", "Стоимость"]]
+    total_price = 0
     for i, item in enumerate(items, 1):
         name = item["name"]
         quantity = item["quantity"]
         unit = item["unit"]
         full_name_product, price = calculate_price(name, f"{quantity} {unit}")
-        if len(full_name_product) > 42:
-            r = full_name_product.split()
-            ind = len(r) // 2
-            full_name_product = " ".join(r[:ind]) + "\n" + " ".join(r[ind:])
+        full_name_product = auto_tabulate(full_name_product)
         item_data.append([str(i), full_name_product, quantity, unit, f"{price}₽"])
+        total_price += price
 
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")
@@ -118,7 +117,7 @@ def generate_invoice(
     cost_style.fontSize = 14
 
     # Общая стоимость
-    elements.append(Paragraph(f"Общая стоимость: {total} руб.", cost_style))
+    elements.append(Paragraph(f"Общая стоимость: {total or total_price} руб.", cost_style))
     elements.append(Spacer(1, 24))
 
     title_style_custom = styles["Normal"].clone(name="custom_title")
@@ -145,6 +144,14 @@ def generate_invoice(
     # Генерация PDF
     doc.build(elements)
     return pdf_filename
+
+
+def auto_tabulate(text: str) -> str:
+    if len(text) > 42:
+        r = text.split()
+        ind = len(r) // 2
+        text = " ".join(r[:ind]) + "\n" + " ".join(r[ind:])
+    return text
 
 
 # order_json = """
