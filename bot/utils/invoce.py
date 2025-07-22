@@ -65,8 +65,6 @@ def generate_invoice(
         item_data.append([str(i), name, quantity, unit, f"{price}₽"])
         total_price += price
 
-    print(total_price)
-
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")
     doc = SimpleDocTemplate(pdf_filename, pagesize=A4, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
