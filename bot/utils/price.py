@@ -295,7 +295,7 @@ def find_best_match(user_input: str) -> ItemPrice:
 catalog = load_items_from_text(TEXT)
 
 
-def calculate_price(name_product: str, quantity: str = "1") -> Decimal:
+def calculate_price(name_product: str, quantity: str = "1") -> tuple[str, Decimal]:
     item = find_best_match(name_product)
     price = get_price(item, quantity)
-    return price
+    return item.name, price

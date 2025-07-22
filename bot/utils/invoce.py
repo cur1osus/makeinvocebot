@@ -56,14 +56,12 @@ def generate_invoice(
 
     # Формируем данные для таблицы товаров
     item_data = [["№", "Наименование товара", "Кол-во", "Ед.", "Стоимость"]]
-    total_price = 0
     for i, item in enumerate(items, 1):
         name = item["name"]
         quantity = item["quantity"]
         unit = item["unit"]
-        price = calculate_price(name, f"{quantity} {unit}")
-        item_data.append([str(i), name, quantity, unit, f"{price}₽"])
-        total_price += price
+        full_name_product, price = calculate_price(name, f"{quantity} {unit}")
+        item_data.append([str(i), full_name_product, quantity, unit, f"{price}₽"])
 
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")
