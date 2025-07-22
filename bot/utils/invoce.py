@@ -3,10 +3,10 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
 from reportlab.lib import colors
-import re
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
+from .price import calculate_price
 
 # Регистрируем шрифт с поддержкой кириллицы
 pdfmetrics.registerFont(TTFont("DejaVuSans", "DejaVuSans.ttf"))
@@ -47,7 +47,6 @@ def generate_invoice(
 
     # Извлекаем данные
     order = order["order"]
-    city = order.get("city")
     name = order.get("name")
     phone = order.get("phone")
     items = order.get("items")
@@ -57,12 +56,16 @@ def generate_invoice(
 
     # Формируем данные для таблицы товаров
     item_data = [["№", "Наименование товара", "Кол-во", "Ед.", "Стоимость"]]
+    total_price = 0
     for i, item in enumerate(items, 1):
         name = item["name"]
-        quantity = item["quantity"]
+        quantity = int(item["quantity"])
         unit = item["unit"]
-        price = item["price"]
-        item_data.append([str(i), name, quantity, unit, price])
+        price = calculate_price(name, f"{quantity} {unit}")
+        item_data.append([str(i), name, str(quantity), unit, f"{price}₽"])
+        total_price += price
+
+    print(total_price)
 
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")

@@ -2,7 +2,6 @@ from groq import Groq
 from dotenv import load_dotenv
 import os
 from typing import Any
-from bot.db.models import MessageDB
 
 load_dotenv()
 
@@ -15,7 +14,7 @@ class Function:
         completion = self.client.chat.completions.create(
             model="mistral-saba-24b",
             messages=chain_messages,
-            temperature=1,
+            temperature=0,
             max_completion_tokens=10000,
             top_p=1,
             stream=False,
