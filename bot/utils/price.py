@@ -225,7 +225,6 @@ def parse_price_line(line: str) -> ItemPrice | None:
             )
         else:
             return ItemPrice(name=name, unit_price=base_price)
-    print(name_part)
     return None
 
 
@@ -299,8 +298,3 @@ def calculate_price(name_product: str, quantity: str = "1") -> tuple[str, Decima
     item = find_best_match(name_product)
     price = get_price(item, quantity)
     return item.name, price
-
-
-for i in catalog:
-    if len(i) > 42:
-        print(i)
