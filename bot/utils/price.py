@@ -223,37 +223,38 @@ def parse_price_line(line: str) -> ItemPrice | None:
 
 def parse_weight_input(input_str: str) -> Decimal:
     """Преобразует строку с весом в килограммы"""
-    match = re.match(r"(?i)^\s*([\d.]+)\s*(г|гр|грамм|кг|кг\.?)\s*$", input_str)
+    match = re.match(r"(?i)^\s*([\d.]+)\s*(г|гр|грамм|кг|кг|литр|л\.?)\s*$", input_str)
     if not match:
-        raise ValueError("Некорректный формат веса. Пример: '0.5 кг' или '300 г'")
+        raise ValueError("Некорректный формат веса. Пример: '0.5 кг' или '300 г или 3 л'")
     amount = Decimal(match.group(1).replace(",", "."))
     unit = match.group(2).lower()
     if "г" in unit and "к" not in unit:
         amount /= 1000
+    elif "л" in unit:
+        amount *= 1000
     return amount.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
 
 
 def get_price(item: ItemPrice, amount_str: str) -> Decimal:
     """Вычисляет итоговую цену товара по весу или количеству"""
-    is_piece = re.search(r"шт|порц|бут|уп|штук|позиц", amount_str, re.I)
-
+    is_piece = re.search(r"шт|порц|п|бут|уп|штук|позиц", amount_str, re.I)
+    is_volume = re.search(r"л|литр", amount_str, re.I)
     if is_piece:
         quantity = Decimal(re.sub(r"[^\d.]", "", amount_str).replace(",", "."))
-        price = (
-            item.discounted_price
-            if item.discount_threshold and quantity >= item.discount_threshold
-            else item.unit_price
-        )
+        price = item.unit_price
         if price is None:
             raise ValueError("Цена товара не указана")
         total = quantity * price
+    elif is_volume:
+        volume = parse_weight_input(amount_str)
+        volume = Decimal(re.sub(r"[^\d.]", "", amount_str).replace(",", "."))
+        price = item.unit_price
+        if price is None:
+            raise ValueError("Цена товара не указана")
+        total = volume * price * 2
     else:
         weight_kg = parse_weight_input(amount_str)
-        price = (
-            item.discounted_price
-            if item.discount_threshold and weight_kg >= item.discount_threshold
-            else item.unit_price
-        )
+        price = item.unit_price
         if price is None:
             raise ValueError("Цена товара не указана")
         total = weight_kg * price
