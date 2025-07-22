@@ -3,6 +3,9 @@ from decimal import Decimal, ROUND_HALF_UP
 import re
 from difflib import get_close_matches
 
+from collections import defaultdict
+from typing_extensions import Iterable
+
 TEXT = """
 Куриные рулетики в панировке с зеленью — 800₽/кг
 Куриные рулетики в панировке с грибами — 800₽/кг
@@ -278,23 +281,31 @@ def load_items_from_text(text: str) -> dict[str, ItemPrice]:
     return items
 
 
+def search(input: str, catalog: Iterable) -> list[str]:
+    """Поиск по частичным совпадениям, ранжированный по числу совпадений"""
+    terms = input.lower().split()
+    scores = defaultdict(int)
+
+    for item in catalog:
+        lowered = item.lower()
+        match_count = sum(term in lowered for term in terms)
+        if match_count > 0:
+            scores[item] = match_count
+
+    return sorted(scores, key=lambda x: (-scores[x], x))
+
+
 def find_best_match(user_input: str) -> ItemPrice:
     """Ищет точное или ближайшее совпадение по названию"""
     if user_input in catalog:
         return catalog[user_input]
-    else:
-        first_search = [j for i in user_input.split() for j in catalog if i in j]
-        if len(first_search) == 1:
-            return catalog[first_search[0]]
-        else:
-            matches = get_close_matches(user_input, first_search, n=1, cutoff=0.5)
-        if not matches:
-            matches = get_close_matches(user_input, catalog.keys(), n=1, cutoff=0.5)
-        if matches:
-            print(f"[!] Использовано приближённое совпадение: '{matches[0]}' вместо '{user_input}'")
-            return catalog[matches[0]]
-        else:
-            return ItemPrice(unit_price=Decimal(0), name="Unknown")
+
+    _search = search(user_input, catalog)
+    if _search:
+        print(f"[!] Использовано приближённое совпадение: '{_search[0]}' вместо '{user_input}'")
+        return catalog[_search[0]]
+
+    return ItemPrice(unit_price=Decimal(0), name="Unknown")
 
 
 catalog = load_items_from_text(TEXT)
