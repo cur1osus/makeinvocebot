@@ -299,3 +299,8 @@ def calculate_price(name_product: str, quantity: str = "1") -> tuple[str, Decima
     item = find_best_match(name_product)
     price = get_price(item, quantity)
     return item.name, price
+
+
+for i in catalog:
+    if len(i) > 42:
+        print(i)
