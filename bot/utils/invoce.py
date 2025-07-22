@@ -61,7 +61,7 @@ def generate_invoice(
         quantity = item["quantity"]
         unit = item["unit"]
         full_name_product, price = calculate_price(name, f"{quantity} {unit}")
-        item_data.append([str(i), full_name_product, quantity, unit, f"{price}₽"])
+        item_data.append([str(i), f"{full_name_product[:35]}...", quantity, unit, f"{price}₽"])
 
     # Создаем PDF
     pdf_filename = f"{phone}_{datetime.now().strftime('%Y%m%d')}.pdf".replace("+", "")
