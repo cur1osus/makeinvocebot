@@ -59,10 +59,10 @@ def generate_invoice(
     total_price = 0
     for i, item in enumerate(items, 1):
         name = item["name"]
-        quantity = int(item["quantity"])
+        quantity = item["quantity"]
         unit = item["unit"]
         price = calculate_price(name, f"{quantity} {unit}")
-        item_data.append([str(i), name, str(quantity), unit, f"{price}₽"])
+        item_data.append([str(i), name, quantity, unit, f"{price}₽"])
         total_price += price
 
     print(total_price)
