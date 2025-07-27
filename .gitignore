@@ -10,3 +10,4 @@ wheels/
 .venv
 .env
 .mypy_cache
+test.py

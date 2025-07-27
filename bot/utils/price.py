@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 import re
-
+from difflib import get_close_matches
 from collections import defaultdict
 from typing_extensions import Iterable
 
@@ -295,6 +295,10 @@ def find_best_match(user_input: str) -> ItemPrice:
     if _search:
         print(f"[!] Использовано приближённое совпадение: '{_search[0]}' вместо '{user_input}'")
         return catalog[_search[0]]
+    matches = get_close_matches(user_input, catalog.keys(), n=1, cutoff=0.5)
+    if matches:
+        print(f"[!] Использовано приближённое совпадение: '{matches[0]}' вместо '{user_input}'")
+        return catalog[matches[0]]
 
     return ItemPrice(unit_price=Decimal(0), name="Unknown")
 
