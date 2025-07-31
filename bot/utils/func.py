@@ -12,7 +12,7 @@ class Function:
 
     def get_answer(self, chain_messages: Any) -> str:
         completion = self.client.chat.completions.create(
-            model="qwen/qwen3-32b",
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
             messages=chain_messages,
             temperature=0,
             max_completion_tokens=1000,

@@ -20,10 +20,6 @@ def generate_invoice(
     year: int = 2025,
 ):
     # Парсим JSON
-    try:
-        order_json = order_json.split("</think>")[1].strip()
-    except Exception:
-        pass
     order_json = order_json.strip().strip("```").lstrip("json")
     order = json.loads(order_json)
     date_str = order["order"].get("date")
